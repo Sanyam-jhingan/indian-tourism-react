@@ -3,10 +3,23 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { configureStore } from "@reduxjs/toolkit";
+import { Provider } from "react-redux";
+import { stateSlice } from './features/StatesReducer';
+import { placeSlice } from './features/PlacesReducer';
+
+const store = configureStore({
+  reducer: {
+    states: stateSlice.reducer,
+    places: placeSlice.reducer,
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
+    <Provider store={store}>
     <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

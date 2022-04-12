@@ -3,6 +3,9 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
+import { useSelector, useDispatch } from 'react-redux';
+import { stateSlice } from "../features/StatesReducer";
+import { useNavigate } from 'react-router-dom';
 
 const ImageButton = styled(ButtonBase)(({ theme }) => ({
     position: 'relative',
@@ -69,7 +72,11 @@ const ImageButton = styled(ButtonBase)(({ theme }) => ({
   }));
 
 export default function States() {
-  const [data, setData] = React.useState([])
+  const dispatch = useDispatch();
+  //const [statesData, setStatesData] = React.useState([]);
+  const stateList = useSelector(state => state.states.value);
+  const navigate = useNavigate();
+  //console.log('statelist',stateList);
 
   React.useEffect(() => {
     fetch("https://indian-tourism-api.herokuapp.com/states", {
@@ -80,33 +87,36 @@ export default function States() {
     })
       .then(res => res.json())
       .then(data => {
-        console.log('hook',data)
-        setData(data)
+        //console.log('hook',data)
+        //setStatesData(data);
+        dispatch(stateSlice.actions.setStates(data));
       })
       .catch(err => console.log(err))
-  }, [])
+  }, [dispatch])
 
-  const images = data.map(item => {
-      return {
-          url : item.image_url,
-          title : item.name,
-          width : "50%",
-      }
-  })
+  // const images = stateList.map(item => {
+  //     return {
+  //         url : item.image_url,
+  //         title : item.name,
+  //         width : "50%",
+  //     }
+  // })
 
-  console.log('images',images)
+  // console.log('images',images)
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
-    {images.map((image) => (
+    {stateList.map((state) => (
       <ImageButton
         focusRipple
-        key={image.title}
+        key={state.name}
         style={{
-          width: image.width,
+          width: "50%",
         }}
+        onClick={() => 
+          navigate(`/states/${state.name}/places`)}
       >
-        <ImageSrc style={{ backgroundImage: `url(${image.url})` }} />
+        <ImageSrc style={{ backgroundImage: `url(${state.image_url})` }} />
         <ImageBackdrop className="MuiImageBackdrop-root" />
         <Image>
           <Typography
@@ -120,7 +130,7 @@ export default function States() {
               pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
             }}
           >
-            {image.title}
+            {state.name}
             <ImageMarked className="MuiImageMarked-root" />
           </Typography>
         </Image>
